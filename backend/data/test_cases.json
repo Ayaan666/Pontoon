@@ -1,0 +1,101 @@
+[
+  {
+    "id": "TC-AUTH-001",
+    "name": "Successful web authentication",
+    "feature": "Authentication",
+    "platform": "Web",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-AUTH-002",
+    "name": "Successful iOS authentication",
+    "feature": "Authentication",
+    "platform": "iOS",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-AUTH-003",
+    "name": "Successful Android authentication",
+    "feature": "Authentication",
+    "platform": "Android",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-SESSION-001",
+    "name": "Session creation after authentication",
+    "feature": "Session Management",
+    "platform": "REST API",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-PAY-001",
+    "name": "Successful web payment authorization",
+    "feature": "Payment Authorization",
+    "platform": "Web",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-PAY-002",
+    "name": "Successful iOS payment authorization",
+    "feature": "Payment Authorization",
+    "platform": "iOS",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-PAY-003",
+    "name": "Successful Android payment authorization",
+    "feature": "Payment Authorization",
+    "platform": "Android",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-PAY-004",
+    "name": "Payment authorization API validation",
+    "feature": "Payment Authorization",
+    "platform": "REST API",
+    "priority": "Critical"
+  },
+  {
+    "id": "TC-RETRY-001",
+    "name": "Payment retry after failed authorization",
+    "feature": "Payment Retry",
+    "platform": "Web",
+    "priority": "High"
+  },
+  {
+    "id": "TC-ORDER-001",
+    "name": "Order creation after successful payment",
+    "feature": "Order Creation",
+    "platform": "Web",
+    "priority": "High"
+  },
+  {
+    "id": "TC-NOTIFY-001",
+    "name": "Order confirmation notification",
+    "feature": "Notifications",
+    "platform": "REST API",
+    "priority": "Medium"
+  },
+  {
+    "id": "TC-PROFILE-001",
+    "name": "Update user profile",
+    "feature": "User Profile",
+    "platform": "Web",
+    "priority": "Medium"
+  }
+  ,
+  {
+    "id": "TC-REPORT-001",
+    "name": "Generate monthly revenue report",
+    "feature": "Reporting",
+    "platform": "Web",
+    "priority": "High"
+  },
+  {
+    "id": "TC-REPORT-002",
+    "name": "Verify monthly revenue report data accuracy",
+    "feature": "Reporting",
+    "platform": "Web",
+    "priority": "Critical"
+  }
+]

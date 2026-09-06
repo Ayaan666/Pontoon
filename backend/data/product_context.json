@@ -1,0 +1,38 @@
+{
+  "project": "Commerce Platform",
+  "description": "A multi-platform commerce application supporting customer authentication, payments, orders, notifications, profiles and reporting.",
+  "platforms": [
+    "Web",
+    "iOS",
+    "Android",
+    "REST API"
+  ],
+  "modules": [
+    "Authentication",
+    "Session Management",
+    "Payment Authorization",
+    "Payment Retry",
+    "Order Creation",
+    "Notifications",
+    "User Profile",
+    "Reporting"
+  ],
+  "dependency_chain": [
+    {
+      "from": "Authentication",
+      "to": "Session Management"
+    },
+    {
+      "from": "Session Management",
+      "to": "Payment Authorization"
+    },
+    {
+      "from": "Payment Authorization",
+      "to": "Order Creation"
+    },
+    {
+      "from": "Order Creation",
+      "to": "Notifications"
+    }
+  ]
+}

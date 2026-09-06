@@ -1,0 +1,50 @@
+[
+  {
+    "id": "FEAT-AUTH",
+    "name": "Authentication",
+    "platforms": ["Web", "iOS", "Android", "REST API"],
+    "depends_on": []
+  },
+  {
+    "id": "FEAT-SESSION",
+    "name": "Session Management",
+    "platforms": ["Web", "iOS", "Android", "REST API"],
+    "depends_on": ["Authentication"]
+  },
+  {
+    "id": "FEAT-PAYMENT",
+    "name": "Payment Authorization",
+    "platforms": ["Web", "iOS", "Android", "REST API"],
+    "depends_on": ["Authentication", "Session Management"]
+  },
+  {
+    "id": "FEAT-RETRY",
+    "name": "Payment Retry",
+    "platforms": ["Web", "iOS", "Android", "REST API"],
+    "depends_on": ["Payment Authorization"]
+  },
+  {
+    "id": "FEAT-ORDER",
+    "name": "Order Creation",
+    "platforms": ["Web", "iOS", "Android", "REST API"],
+    "depends_on": ["Payment Authorization"]
+  },
+  {
+    "id": "FEAT-NOTIFY",
+    "name": "Notifications",
+    "platforms": ["Web", "iOS", "Android", "REST API"],
+    "depends_on": ["Order Creation"]
+  },
+  {
+    "id": "FEAT-PROFILE",
+    "name": "User Profile",
+    "platforms": ["Web", "iOS", "Android", "REST API"],
+    "depends_on": ["Authentication"]
+  },
+  {
+    "id": "FEAT-REPORTING",
+    "name": "Reporting",
+    "platforms": ["Web", "REST API"],
+    "depends_on": []
+  }
+]

@@ -2,12 +2,16 @@ import json
 from pathlib import Path
 from typing import Dict, List, Set
 
+from atlas.retriever import retrieve_context
+
 
 # =========================================================
 # DATA LOCATION
 # =========================================================
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+
+SEMANTIC_FEATURE_THRESHOLD = 0.35
 
 
 # =========================================================
@@ -625,6 +629,51 @@ def build_explanation(
 
 
 # =========================================================
+# SEMANTIC FEATURE DETECTION
+# =========================================================
+
+def find_semantic_features(
+    change: str,
+    context: Dict
+) -> Dict:
+
+    retrieval = retrieve_context(
+        query=change,
+        context=context,
+        top_k=5
+    )
+
+    feature_results = retrieval.get(
+        "features",
+        []
+    )
+
+    if not feature_results:
+        return {
+            "features": set(),
+            "confidence": "low",
+            "matches": []
+        }
+
+    top_match = feature_results[0]
+
+    if top_match["score"] < SEMANTIC_FEATURE_THRESHOLD:
+        return {
+            "features": set(),
+            "confidence": "low",
+            "matches": feature_results
+        }
+
+    return {
+        "features": {
+            top_match["name"]
+        },
+        "confidence": "high",
+        "matches": feature_results
+    }
+
+
+# =========================================================
 # MAIN ANALYSIS
 # =========================================================
 
@@ -653,9 +702,24 @@ def analyze_change(
     # Identify direct impact
     # -----------------------------------------------------
 
-    directly_affected = find_affected_features(
+    # v0.3 deterministic keyword detection
+    keyword_features = find_affected_features(
         change,
         features
+    )
+
+    # v0.4 semantic retrieval
+    semantic_result = find_semantic_features(
+        change,
+        context
+    )
+
+    semantic_features = semantic_result["features"]
+
+    # Hybrid impact detection
+    directly_affected = (
+        keyword_features
+        | semantic_features
     )
 
     # -----------------------------------------------------
@@ -700,11 +764,7 @@ def analyze_change(
     # Confidence
     # -----------------------------------------------------
 
-    confidence = (
-        "high"
-        if directly_affected
-        else "low"
-    )
+    confidence = semantic_result["confidence"]
 
     # -----------------------------------------------------
     # Explanation
@@ -786,6 +846,12 @@ def analyze_change(
 
         "explanation":
             explanation,
+
+        "retrieval": {
+            "method": "semantic",
+            "threshold": SEMANTIC_FEATURE_THRESHOLD,
+            "matches": semantic_result["matches"]
+        },
 
         "graph": {
 

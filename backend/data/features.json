@@ -2,48 +2,56 @@
   {
     "id": "FEAT-AUTH",
     "name": "Authentication",
+    "description": "Verifies a customer's identity when signing in and provides authenticated access to the application.",
     "platforms": ["Web", "iOS", "Android", "REST API"],
     "depends_on": []
   },
   {
     "id": "FEAT-SESSION",
     "name": "Session Management",
+    "description": "Maintains authenticated customer sessions across the application and controls session state after login.",
     "platforms": ["Web", "iOS", "Android", "REST API"],
     "depends_on": ["Authentication"]
   },
   {
     "id": "FEAT-PAYMENT",
     "name": "Payment Authorization",
+    "description": "Authorizes customer payments and verifies the customer before a payment is completed, including biometric verification such as Face ID or fingerprint authentication.",
     "platforms": ["Web", "iOS", "Android", "REST API"],
     "depends_on": ["Authentication", "Session Management"]
   },
   {
     "id": "FEAT-RETRY",
     "name": "Payment Retry",
+    "description": "Allows a failed or interrupted customer payment to be attempted again.",
     "platforms": ["Web", "iOS", "Android", "REST API"],
     "depends_on": ["Payment Authorization"]
   },
   {
     "id": "FEAT-ORDER",
     "name": "Order Creation",
+    "description": "Creates a customer order after the required purchase and payment flow has been completed.",
     "platforms": ["Web", "iOS", "Android", "REST API"],
     "depends_on": ["Payment Authorization"]
   },
   {
     "id": "FEAT-NOTIFY",
     "name": "Notifications",
+    "description": "Sends customer notifications such as order confirmations and other updates after relevant application events.",
     "platforms": ["Web", "iOS", "Android", "REST API"],
     "depends_on": ["Order Creation"]
   },
   {
     "id": "FEAT-PROFILE",
     "name": "User Profile",
+    "description": "Manages customer profile information such as account details and profile data.",
     "platforms": ["Web", "iOS", "Android", "REST API"],
     "depends_on": ["Authentication"]
   },
   {
     "id": "FEAT-REPORTING",
     "name": "Reporting",
+    "description": "Provides business reporting and dashboard capabilities, including revenue reports and reporting data.",
     "platforms": ["Web", "REST API"],
     "depends_on": []
   }

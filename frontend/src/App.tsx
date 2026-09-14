@@ -109,33 +109,32 @@ function App() {
    */
 
   const regressionSummary =
-    regression?.summary;
+  regression?.summary;
 
-  const mustRunTests =
-    normalizeTests(
-      regressionSummary?.must_run
-    );
+const regressionRecommendations =
+  regression?.recommendations ?? [];
 
-  const recommendedTests =
-    normalizeTests(
-      regressionSummary?.recommended
-    );
+const mustRunTests =
+  regressionRecommendations.filter(
+    (test) =>
+      test.recommendation === "MUST_RUN"
+  );
 
-  const optionalTests =
-    normalizeTests(
-      regressionSummary?.optional
-    );
+const recommendedTests =
+  regressionRecommendations.filter(
+    (test) =>
+      test.recommendation === "RECOMMENDED"
+  );
 
-  const calculatedRegressionCount =
-    mustRunTests.length +
-    recommendedTests.length +
-    optionalTests.length;
+const optionalTests =
+  regressionRecommendations.filter(
+    (test) =>
+      test.recommendation === "OPTIONAL"
+  );
 
-  const regressionCount =
-    typeof regressionSummary?.total_recommended ===
-      "number"
-      ? regressionSummary.total_recommended
-      : calculatedRegressionCount;
+const regressionCount =
+  regressionSummary?.total_recommended ??
+  regressionRecommendations.length;
 
   const directFeatures =
     impact?.directly_affected_features ?? [];
@@ -1003,57 +1002,41 @@ function App() {
                       ================================================= */}
 
                   {mustRunTests.map(
-                    (test, index) => (
+  (test) => (
 
-                      <div
-                        className="test-row"
-                        key={`must-${
-                          test.test_id ?? index
-                        }`}
-                      >
+    <div
+      className="test-row"
+      key={test.test_id}
+    >
 
-                        <div className="test-id">
+      <div className="test-id">
+        {test.test_id}
+      </div>
 
-                          {test.test_id ??
-                            "TEST"}
+      <div className="test-main">
 
-                        </div>
+        <strong>
+          {test.test_name}
+        </strong>
 
+        <span>
+          {test.feature} · {test.platform}
+        </span>
 
-                        <div className="test-main">
+      </div>
 
-                          <strong>
+      <div className="priority priority-p0">
+        {test.priority}
+      </div>
 
-                            {test.name ??
-                              "Unnamed test"}
+      <div className="test-action">
+        MUST RUN
+      </div>
 
-                          </strong>
+    </div>
 
-
-                          {test.platform && (
-
-                            <span>
-                              {test.platform}
-                            </span>
-
-                          )}
-
-                        </div>
-
-
-                        <div className="priority priority-p0">
-                          P0
-                        </div>
-
-
-                        <div className="test-action">
-                          MUST RUN
-                        </div>
-
-                      </div>
-
-                    )
-                  )}
+  )
+)}
 
 
                   {/* =================================================
@@ -1061,57 +1044,41 @@ function App() {
                       ================================================= */}
 
                   {recommendedTests.map(
-                    (test, index) => (
+  (test) => (
 
-                      <div
-                        className="test-row"
-                        key={`recommended-${
-                          test.test_id ?? index
-                        }`}
-                      >
+    <div
+      className="test-row"
+      key={test.test_id}
+    >
 
-                        <div className="test-id">
+      <div className="test-id">
+        {test.test_id}
+      </div>
 
-                          {test.test_id ??
-                            "TEST"}
+      <div className="test-main">
 
-                        </div>
+        <strong>
+          {test.test_name}
+        </strong>
 
+        <span>
+          {test.feature} · {test.platform}
+        </span>
 
-                        <div className="test-main">
+      </div>
 
-                          <strong>
+      <div className="priority priority-p1">
+        {test.priority}
+      </div>
 
-                            {test.name ??
-                              "Unnamed test"}
+      <div className="test-action">
+        RECOMMENDED
+      </div>
 
-                          </strong>
+    </div>
 
-
-                          {test.platform && (
-
-                            <span>
-                              {test.platform}
-                            </span>
-
-                          )}
-
-                        </div>
-
-
-                        <div className="priority priority-p1">
-                          P1
-                        </div>
-
-
-                        <div className="test-action">
-                          RECOMMENDED
-                        </div>
-
-                      </div>
-
-                    )
-                  )}
+  )
+)}
 
 
                   {/* =================================================
@@ -1119,57 +1086,41 @@ function App() {
                       ================================================= */}
 
                   {optionalTests.map(
-                    (test, index) => (
+  (test) => (
 
-                      <div
-                        className="test-row"
-                        key={`optional-${
-                          test.test_id ?? index
-                        }`}
-                      >
+    <div
+      className="test-row"
+      key={test.test_id}
+    >
 
-                        <div className="test-id">
+      <div className="test-id">
+        {test.test_id}
+      </div>
 
-                          {test.test_id ??
-                            "TEST"}
+      <div className="test-main">
 
-                        </div>
+        <strong>
+          {test.test_name}
+        </strong>
 
+        <span>
+          {test.feature} · {test.platform}
+        </span>
 
-                        <div className="test-main">
+      </div>
 
-                          <strong>
+      <div className="priority priority-p2">
+        {test.priority}
+      </div>
 
-                            {test.name ??
-                              "Unnamed test"}
+      <div className="test-action">
+        OPTIONAL
+      </div>
 
-                          </strong>
+    </div>
 
-
-                          {test.platform && (
-
-                            <span>
-                              {test.platform}
-                            </span>
-
-                          )}
-
-                        </div>
-
-
-                        <div className="priority priority-p2">
-                          P2
-                        </div>
-
-
-                        <div className="test-action">
-                          OPTIONAL
-                        </div>
-
-                      </div>
-
-                    )
-                  )}
+  )
+)}
 
 
                   {/* =================================================

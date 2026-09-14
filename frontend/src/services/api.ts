@@ -2,21 +2,42 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 
 export interface TestRecommendation {
   test_id: string;
-  name: string;
-  priority?: string;
-  action?: string;
-  platform?: string;
+  test_name: string;
+  feature: string;
+  platform: string;
+  original_priority: string;
+  classification: string;
+  recommendation: string;
+  priority: string;
+  reason: string;
 }
 
 export interface RegressionSummary {
   total_recommended: number;
-  must_run: TestRecommendation[];
-  recommended: TestRecommendation[];
-  optional: TestRecommendation[];
+  must_run: number;
+  recommended: number;
+  optional: number;
+}
+
+export interface RegressionResult {
+  summary: RegressionSummary;
+  recommendations: TestRecommendation[];
+}
+
+export interface RetrievalMatch {
+  type: string;
+  id: string;
+  name: string;
+  score: number;
+  matched_context?: string;
+  evidence?: {
+    source: string;
+    entity_id: string;
+  };
 }
 
 export interface AnalyzeResponse {
-  confidence: string;
+  change: string;
 
   impact: {
     directly_affected_features: string[];
@@ -25,26 +46,28 @@ export interface AnalyzeResponse {
     affected_platforms: string[];
   };
 
-  regression: {
-    summary: RegressionSummary;
-  };
+  regression: RegressionResult;
+
+  confidence: string;
+
+  explanation: string[];
 
   retrieval?: {
     method?: string;
     threshold?: number;
-    matches?: Array<{
-      name: string;
-      score: number;
-      description?: string;
-      type?: string;
-    }>;
+    matches?: RetrievalMatch[];
   };
 
-  evidence?: Record<string, unknown>;
+  graph?: {
+    node_count: number;
+    relationship_count: number;
+  };
 
-  graph?: Record<string, unknown>;
-
-  [key: string]: unknown;
+  evidence?: {
+    product_context: string;
+    features: string;
+    test_cases: string;
+  };
 }
 
 export async function analyzeChange(

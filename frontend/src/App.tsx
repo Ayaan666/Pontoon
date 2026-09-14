@@ -20,42 +20,10 @@ import {
 import { analyzeChange } from "./services/api";
 import type { AnalyzeResponse } from "./services/api";
 
+import RegressionScope from "./components/RegressionScope";
+
 import "./index.css";
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
-
-function normalizeTests(value: unknown): any[] {
-  if (Array.isArray(value)) {
-    return value;
-  }
-
-  if (value && typeof value === "object") {
-    const obj = value as Record<string, unknown>;
-
-    if (Array.isArray(obj.tests)) {
-      return obj.tests;
-    }
-
-    if (Array.isArray(obj.items)) {
-      return obj.items;
-    }
-
-    return Object.values(obj).filter(
-      (item) =>
-        item &&
-        typeof item === "object" &&
-        ("test_id" in item || "name" in item)
-    );
-  }
-
-  return [];
-}
-
-/* =========================================================
-   APP
-   ========================================================= */
 
 function App() {
   const [change, setChange] = useState("");
@@ -65,9 +33,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  /* =======================================================
-     ANALYZE
-     ======================================================= */
+
+  /* =========================================================
+     ANALYZE CHANGE
+     ========================================================= */
 
   async function handleAnalyze() {
     if (!change.trim() || loading) {
@@ -84,57 +53,35 @@ function App() {
       );
 
       setAnalysis(result);
+
     } catch (err) {
+
       setError(
         err instanceof Error
           ? err.message
           : "Unable to analyze this change."
       );
+
     } finally {
+
       setLoading(false);
+
     }
   }
 
-  /* =======================================================
-     DATA
-     ======================================================= */
+
+  /* =========================================================
+     ATLAS DATA
+     ========================================================= */
 
   const impact = analysis?.impact;
   const regression = analysis?.regression;
   const retrieval = analysis?.retrieval;
 
-  /*
-   * Atlas regression structure may contain recommendation
-   * buckets as arrays or objects.
-   */
 
-  const regressionSummary =
-  regression?.summary;
-
-const regressionRecommendations =
-  regression?.recommendations ?? [];
-
-const mustRunTests =
-  regressionRecommendations.filter(
-    (test) =>
-      test.recommendation === "MUST_RUN"
-  );
-
-const recommendedTests =
-  regressionRecommendations.filter(
-    (test) =>
-      test.recommendation === "RECOMMENDED"
-  );
-
-const optionalTests =
-  regressionRecommendations.filter(
-    (test) =>
-      test.recommendation === "OPTIONAL"
-  );
-
-const regressionCount =
-  regressionSummary?.total_recommended ??
-  regressionRecommendations.length;
+  /* =========================================================
+     IMPACT DATA
+     ========================================================= */
 
   const directFeatures =
     impact?.directly_affected_features ?? [];
@@ -148,18 +95,51 @@ const regressionCount =
         !directFeatures.includes(feature)
     );
 
-  /* =======================================================
+
+  /* =========================================================
+     REGRESSION DATA
+
+     Actual Atlas structure:
+
+     regression:
+       summary:
+         total_recommended
+         must_run
+         recommended
+         optional
+
+       recommendations:
+         [...]
+     ========================================================= */
+
+  const regressionSummary =
+    regression?.summary;
+
+  const regressionRecommendations =
+    regression?.recommendations ?? [];
+
+  const regressionCount =
+    regressionSummary?.total_recommended ??
+    regressionRecommendations.length;
+
+
+  /* =========================================================
      UI
-     ======================================================= */
+     ========================================================= */
 
   return (
+
     <div className="app-shell">
 
-      {/* ===================================================
+
+      {/* =====================================================
           SIDEBAR
-          =================================================== */}
+          ===================================================== */}
 
       <aside className="sidebar">
+
+
+        {/* BRAND */}
 
         <div className="brand">
 
@@ -174,17 +154,21 @@ const regressionCount =
         </div>
 
 
+        {/* WORKSPACE */}
+
         <div className="workspace">
 
           <div className="workspace-label">
             WORKSPACE
           </div>
 
+
           <button className="project-selector">
 
             <div className="project-icon">
               C
             </div>
+
 
             <div className="project-info">
 
@@ -198,6 +182,7 @@ const regressionCount =
 
             </div>
 
+
             <ChevronDown size={15} />
 
           </button>
@@ -205,7 +190,10 @@ const regressionCount =
         </div>
 
 
+        {/* NAVIGATION */}
+
         <nav className="nav">
+
 
           <div className="nav-section">
             OPERATE
@@ -273,7 +261,10 @@ const regressionCount =
         </nav>
 
 
+        {/* SIDEBAR BOTTOM */}
+
         <div className="sidebar-bottom">
+
 
           <button className="nav-item">
 
@@ -316,18 +307,17 @@ const regressionCount =
       </aside>
 
 
-      {/* ===================================================
+      {/* =====================================================
           MAIN
-          =================================================== */}
+          ===================================================== */}
 
       <main className="main">
 
 
-        {/* =================================================
-            TOP BAR
-            ================================================= */}
+        {/* TOP BAR */}
 
         <header className="topbar">
+
 
           <div className="breadcrumbs">
 
@@ -348,6 +338,7 @@ const regressionCount =
 
           <div className="topbar-right">
 
+
             <div className="environment">
 
               <span className="environment-dot" />
@@ -366,9 +357,9 @@ const regressionCount =
         </header>
 
 
-        {/* =================================================
+        {/* ===================================================
             CONTENT
-            ================================================= */}
+            =================================================== */}
 
         <div className="content">
 
@@ -411,7 +402,9 @@ const regressionCount =
 
           <section className="change-card">
 
+
             <div className="card-header">
+
 
               <div>
 
@@ -451,6 +444,7 @@ const regressionCount =
 
             <div className="input-footer">
 
+
               <span>
                 Example: Add biometric confirmation
                 before a customer pays on an iPhone.
@@ -464,6 +458,7 @@ const regressionCount =
                   !change.trim() || loading
                 }
               >
+
 
                 {loading ? (
 
@@ -507,11 +502,13 @@ const regressionCount =
 
               <AlertTriangle size={17} />
 
+
               <div>
 
                 <strong>
                   Analysis failed
                 </strong>
+
 
                 <span>
                   {error}
@@ -532,15 +529,19 @@ const regressionCount =
             !loading &&
             !error && (
 
+
               <section className="results-preview">
 
+
                 <div className="section-heading">
+
 
                   <div>
 
                     <span className="card-label">
                       ANALYSIS OUTPUT
                     </span>
+
 
                     <h2>
                       Impact intelligence
@@ -559,10 +560,14 @@ const regressionCount =
                 <div className="preview-grid">
 
 
+                  {/* IMPACT */}
+
                   <div className="preview-card">
 
                     <div className="preview-icon">
+
                       <GitBranch size={18} />
+
                     </div>
 
 
@@ -572,9 +577,11 @@ const regressionCount =
                         IMPACT
                       </span>
 
+
                       <strong>
                         —
                       </strong>
+
 
                       <small>
                         Direct & dependent features
@@ -585,10 +592,14 @@ const regressionCount =
                   </div>
 
 
+                  {/* EVIDENCE */}
+
                   <div className="preview-card">
 
                     <div className="preview-icon">
+
                       <Search size={18} />
+
                     </div>
 
 
@@ -598,9 +609,11 @@ const regressionCount =
                         EVIDENCE
                       </span>
 
+
                       <strong>
                         —
                       </strong>
+
 
                       <small>
                         Semantic context matches
@@ -611,10 +624,14 @@ const regressionCount =
                   </div>
 
 
+                  {/* REGRESSION */}
+
                   <div className="preview-card">
 
                     <div className="preview-icon">
+
                       <ShieldCheck size={18} />
+
                     </div>
 
 
@@ -624,9 +641,11 @@ const regressionCount =
                         REGRESSION
                       </span>
 
+
                       <strong>
                         —
                       </strong>
+
 
                       <small>
                         Recommended test scope
@@ -651,16 +670,19 @@ const regressionCount =
 
             <div className="loading-state">
 
+
               <Loader2
                 size={22}
                 className="spin"
               />
+
 
               <div>
 
                 <strong>
                   Atlas is analyzing the change
                 </strong>
+
 
                 <span>
                   Retrieving semantic context,
@@ -681,6 +703,7 @@ const regressionCount =
 
           {analysis && (
 
+
             <section className="analysis-results">
 
 
@@ -690,11 +713,13 @@ const regressionCount =
 
               <div className="result-header">
 
+
                 <div>
 
                   <span className="card-label">
                     ATLAS ANALYSIS
                   </span>
+
 
                   <h2>
                     Impact intelligence
@@ -723,10 +748,11 @@ const regressionCount =
 
 
               {/* =================================================
-                  IMPACT
+                  IMPACT CARD
                   ================================================= */}
 
               <div className="result-card">
+
 
                 <div className="result-card-title">
 
@@ -742,7 +768,7 @@ const regressionCount =
                 <div className="impact-layout">
 
 
-                  {/* DIRECT */}
+                  {/* DIRECTLY AFFECTED */}
 
                   <div>
 
@@ -760,7 +786,9 @@ const regressionCount =
                             className="feature-chip primary"
                             key={feature}
                           >
+
                             {feature}
+
                           </div>
 
                         )
@@ -769,7 +797,9 @@ const regressionCount =
                     ) : (
 
                       <span className="empty-value">
+
                         No direct impact identified
+
                       </span>
 
                     )}
@@ -795,7 +825,9 @@ const regressionCount =
                             className="feature-chip"
                             key={feature}
                           >
+
                             {feature}
+
                           </div>
 
                         )
@@ -804,7 +836,9 @@ const regressionCount =
                     ) : (
 
                       <span className="empty-value">
+
                         No dependent features
+
                       </span>
 
                     )}
@@ -832,7 +866,9 @@ const regressionCount =
                               className="platform-chip"
                               key={platform}
                             >
+
                               {platform}
+
                             </span>
 
                           )
@@ -843,7 +879,9 @@ const regressionCount =
                     ) : (
 
                       <span className="empty-value">
+
                         No platform scope identified
+
                       </span>
 
                     )}
@@ -861,6 +899,7 @@ const regressionCount =
 
               <div className="result-card">
 
+
                 <div className="result-card-title">
 
                   <Search size={17} />
@@ -874,6 +913,7 @@ const regressionCount =
 
                 <div className="evidence-header">
 
+
                   <span>
                     Context retrieved from the
                     product knowledge base
@@ -883,8 +923,10 @@ const regressionCount =
                   {retrieval?.threshold !== undefined && (
 
                     <span>
+
                       Threshold{" "}
                       {retrieval.threshold}
+
                     </span>
 
                   )}
@@ -894,6 +936,7 @@ const regressionCount =
 
                 <div className="evidence-list">
 
+
                   {retrieval?.matches?.map(
                     (match) => (
 
@@ -902,6 +945,7 @@ const regressionCount =
                         key={`${match.name}-${match.score}`}
                       >
 
+
                         <div className="evidence-main">
 
                           <strong>
@@ -909,10 +953,10 @@ const regressionCount =
                           </strong>
 
 
-                          {match.description && (
+                          {match.matched_context && (
 
                             <span>
-                              {match.description}
+                              {match.matched_context}
                             </span>
 
                           )}
@@ -921,6 +965,7 @@ const regressionCount =
 
 
                         <div className="similarity">
+
 
                           <span>
                             {match.score.toFixed(4)}
@@ -951,7 +996,9 @@ const regressionCount =
                   {!retrieval?.matches?.length && (
 
                     <div className="empty-result">
+
                       No semantic matches were returned.
+
                     </div>
 
                   )}
@@ -962,185 +1009,17 @@ const regressionCount =
 
 
               {/* =================================================
-                  REGRESSION
+                  REGRESSION SCOPE
                   ================================================= */}
 
-              <div className="result-card">
-
-                <div className="result-card-title">
-
-                  <ShieldCheck size={17} />
-
-                  <span>
-                    REGRESSION SCOPE
-                  </span>
-
-
-                  <span className="result-count">
-                    {regressionCount} tests
-                  </span>
-
-                </div>
-
-
-                <div className="regression-summary">
-
-                  Atlas identified{" "}
-                  {regressionCount} regression test
-                  {regressionCount === 1
-                    ? ""
-                    : "s"} for this change.
-
-                </div>
-
-
-                <div className="test-list">
-
-
-                  {/* =================================================
-                      MUST RUN
-                      ================================================= */}
-
-                  {mustRunTests.map(
-  (test) => (
-
-    <div
-      className="test-row"
-      key={test.test_id}
-    >
-
-      <div className="test-id">
-        {test.test_id}
-      </div>
-
-      <div className="test-main">
-
-        <strong>
-          {test.test_name}
-        </strong>
-
-        <span>
-          {test.feature} · {test.platform}
-        </span>
-
-      </div>
-
-      <div className="priority priority-p0">
-        {test.priority}
-      </div>
-
-      <div className="test-action">
-        MUST RUN
-      </div>
-
-    </div>
-
-  )
-)}
-
-
-                  {/* =================================================
-                      RECOMMENDED
-                      ================================================= */}
-
-                  {recommendedTests.map(
-  (test) => (
-
-    <div
-      className="test-row"
-      key={test.test_id}
-    >
-
-      <div className="test-id">
-        {test.test_id}
-      </div>
-
-      <div className="test-main">
-
-        <strong>
-          {test.test_name}
-        </strong>
-
-        <span>
-          {test.feature} · {test.platform}
-        </span>
-
-      </div>
-
-      <div className="priority priority-p1">
-        {test.priority}
-      </div>
-
-      <div className="test-action">
-        RECOMMENDED
-      </div>
-
-    </div>
-
-  )
-)}
-
-
-                  {/* =================================================
-                      OPTIONAL
-                      ================================================= */}
-
-                  {optionalTests.map(
-  (test) => (
-
-    <div
-      className="test-row"
-      key={test.test_id}
-    >
-
-      <div className="test-id">
-        {test.test_id}
-      </div>
-
-      <div className="test-main">
-
-        <strong>
-          {test.test_name}
-        </strong>
-
-        <span>
-          {test.feature} · {test.platform}
-        </span>
-
-      </div>
-
-      <div className="priority priority-p2">
-        {test.priority}
-      </div>
-
-      <div className="test-action">
-        OPTIONAL
-      </div>
-
-    </div>
-
-  )
-)}
-
-
-                  {/* =================================================
-                      EMPTY REGRESSION
-                      ================================================= */}
-
-                  {regressionCount === 0 && (
-
-                    <div className="empty-result">
-
-                      Atlas did not recommend any
-                      regression tests.
-
-                    </div>
-
-                  )}
-
-                </div>
-
-              </div>
+              <RegressionScope
+                recommendations={
+                  regressionRecommendations
+                }
+                totalRecommended={
+                  regressionCount
+                }
+              />
 
 
               {/* =================================================
@@ -1148,6 +1027,7 @@ const regressionCount =
                   ================================================= */}
 
               <div className="qa-review">
+
 
                 <div>
 
@@ -1171,6 +1051,7 @@ const regressionCount =
 
 
                 <div className="review-actions">
+
 
                   <button className="review-button secondary">
                     Modify
@@ -1205,19 +1086,24 @@ const regressionCount =
 
           <div className="footer-note">
 
+
             <span className="status-dot" />
 
             Atlas deterministic engine connected
 
+
             <span className="footer-separator">
               •
             </span>
+
 
             Semantic retrieval enabled
 
+
             <span className="footer-separator">
               •
             </span>
+
 
             {analysis
               ? "Live Atlas analysis"

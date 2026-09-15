@@ -17,10 +17,19 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { analyzeChange } from "./services/api";
-import type { AnalyzeResponse } from "./services/api";
+import {
+  analyzeChange,
+  reasonChange,
+} from "./services/api";
+
+import type {
+  AnalyzeResponse,
+  AIReasoningData,
+} from "./services/api";
 
 import RegressionScope from "./components/RegressionScope";
+
+import AIReasoning from "./components/AIReasoning";
 
 import "./index.css";
 
@@ -31,7 +40,13 @@ function App() {
     useState<AnalyzeResponse | null>(null);
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+const [reasoningLoading, setReasoningLoading] =
+  useState(false);
+
+const [reasoning, setReasoning] =
+  useState<AIReasoningData | null>(null);
+
+const [error, setError] = useState("");
 
 
   /* =========================================================
@@ -48,26 +63,60 @@ function App() {
     setAnalysis(null);
 
     try {
-      const result = await analyzeChange(
-        change.trim()
-      );
 
-      setAnalysis(result);
+  const result = await analyzeChange(
+    change.trim()
+  );
 
-    } catch (err) {
+  setAnalysis(result);
 
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to analyze this change."
-      );
+  setReasoning(null);
 
-    } finally {
+} catch (err) {
 
-      setLoading(false);
+  setError(
+    err instanceof Error
+      ? err.message
+      : "Unable to analyze this change."
+  );
 
-    }
+} finally {
+
+  setLoading(false);
+
+}
   }
+  async function handleReason() {
+  if (!change.trim() || reasoningLoading) {
+    return;
+  }
+
+  setReasoningLoading(true);
+  setError("");
+
+  try {
+    const result = await reasonChange(
+      change.trim()
+    );
+
+    setReasoning(result.reasoning);
+
+  } catch (err) {
+
+    setReasoning(null);
+
+    setError(
+      err instanceof Error
+        ? err.message
+        : "AI reasoning is currently unavailable."
+    );
+
+  } finally {
+
+    setReasoningLoading(false);
+
+  }
+}
 
 
   /* =========================================================
@@ -1021,7 +1070,76 @@ function App() {
                 }
               />
 
+{/* =================================================
+    AI REASONING
+    ================================================= */}
 
+{analysis && (
+
+  <>
+
+    <div className="ai-action">
+
+      <div>
+
+        <span className="card-label">
+          M03 REASONING LAYER
+        </span>
+
+        <strong>
+          Turn Atlas evidence into QA reasoning.
+        </strong>
+
+        <span>
+          GPT-5.6 Sol will reason only over
+          the evidence produced by Atlas.
+        </span>
+
+      </div>
+
+
+      <button
+        className="review-button primary"
+        onClick={handleReason}
+        disabled={reasoningLoading}
+      >
+
+        {reasoningLoading ? (
+
+          <>
+            <Loader2
+              size={15}
+              className="spin"
+            />
+
+            Reasoning...
+
+          </>
+
+        ) : (
+
+          <>
+            <Sparkles size={15} />
+
+            Run AI Reasoning
+
+          </>
+
+        )}
+
+      </button>
+
+    </div>
+
+
+    <AIReasoning
+      reasoning={reasoning}
+      loading={reasoningLoading}
+    />
+
+  </>
+
+)}
               {/* =================================================
                   QA REVIEW
                   ================================================= */}

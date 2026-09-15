@@ -1,5 +1,10 @@
 const API_BASE_URL = "http://127.0.0.1:8000";
 
+
+/* =========================================================
+   ATLAS TYPES
+   ========================================================= */
+
 export interface TestRecommendation {
   test_id: string;
   test_name: string;
@@ -12,6 +17,7 @@ export interface TestRecommendation {
   reason: string;
 }
 
+
 export interface RegressionSummary {
   total_recommended: number;
   must_run: number;
@@ -19,10 +25,12 @@ export interface RegressionSummary {
   optional: number;
 }
 
+
 export interface RegressionResult {
   summary: RegressionSummary;
   recommendations: TestRecommendation[];
 }
+
 
 export interface RetrievalMatch {
   type: string;
@@ -30,11 +38,13 @@ export interface RetrievalMatch {
   name: string;
   score: number;
   matched_context?: string;
+
   evidence?: {
     source: string;
     entity_id: string;
   };
 }
+
 
 export interface AnalyzeResponse {
   change: string;
@@ -70,29 +80,112 @@ export interface AnalyzeResponse {
   };
 }
 
+
+/* =========================================================
+   M03 — AI REASONING TYPES
+   ========================================================= */
+
+export interface AIReasoningData {
+  summary: string;
+
+  impact_reasoning: string[];
+
+  risk_areas: string[];
+
+  qa_focus: string[];
+
+  ambiguities: string[];
+}
+
+
+export interface ReasonResponse {
+  change: string;
+
+  atlas: {
+    confidence: string;
+
+    impact: AnalyzeResponse["impact"];
+
+    regression: RegressionResult;
+  };
+
+  reasoning: AIReasoningData;
+}
+
+
+/* =========================================================
+   ATLAS ANALYSIS
+   ========================================================= */
+
 export async function analyzeChange(
   change: string
 ): Promise<AnalyzeResponse> {
+
   const response = await fetch(
     `${API_BASE_URL}/api/analyze`,
     {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
       },
+
       body: JSON.stringify({
         change,
       }),
     }
   );
 
+
   if (!response.ok) {
-    const errorText = await response.text();
+
+    const errorText =
+      await response.text();
 
     throw new Error(
       `Atlas analysis failed (${response.status}): ${errorText}`
     );
   }
+
+
+  return response.json();
+}
+
+
+/* =========================================================
+   M03 — AI REASONING
+   ========================================================= */
+
+export async function reasonChange(
+  change: string
+): Promise<ReasonResponse> {
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/reason`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        change,
+      }),
+    }
+  );
+
+
+  if (!response.ok) {
+
+    const errorText =
+      await response.text();
+
+    throw new Error(
+      `AI reasoning failed (${response.status}): ${errorText}`
+    );
+  }
+
 
   return response.json();
 }
